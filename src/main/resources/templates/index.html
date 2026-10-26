@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Streaming RAG | Studio</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+
+    <!-- Stylesheet -->
+    <link rel="stylesheet" th:href="@{/css/app.css}">
+
+    <!-- Markdown & Sanitizer -->
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/dompurify/dist/purify.min.js"></script>
+</head>
+<body class="chat-app">
+
+    <!-- LEFT WORKBENCH SIDEBAR -->
+    <aside class="sidebar" id="sidebar">
+        <div class="sidebar-header">
+            <div class="brand">
+                <div class="brand-avatar">R</div>
+                <div>
+                    <span class="brand-name">Streaming <strong>RAG</strong></span>
+                    <span class="brand-status"><span class="status-pulse"></span> Active Pipeline</span>
+                </div>
+            </div>
+            <!-- Gemini-Style Close Button -->
+            <button class="btn-icon gemini-toggle-btn" id="sidebarCloseBtn" title="Collapse sidebar">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                    <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
+                    <line x1="9" y1="3" x2="9" y2="21"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="sidebar-action-bar">
+            <button class="btn btn-primary btn-block btn-new-chat" id="newChatSidebarBtn">
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                New Chat
+            </button>
+        </div>
+
+        <div class="sidebar-content">
+            <!-- RECENT CONVERSATIONS HISTORY -->
+            <div class="sidebar-section">
+                <div class="section-title">
+                    <span>💬 Recent Conversations</span>
+                </div>
+                <div id="conversationHistoryList" class="history-list">
+                    <div class="history-empty">No previous sessions yet</div>
+                </div>
+            </div>
+
+            <!-- DOCUMENT INGESTION -->
+            <div class="sidebar-section">
+                <div class="section-title">
+                    <span>📄 Document Ingestion</span>
+                </div>
+                <form id="uploadForm" class="sidebar-form">
+                    <label class="drop-capsule" for="pdfFile">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
+                        <span id="dropLabel">Select or drop PDFs</span>
+                        <input id="pdfFile" name="files" type="file" accept="application/pdf,.pdf" multiple required>
+                    </label>
+                    <div id="fileSelectionList" class="file-badges"></div>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload & Index</button>
+                </form>
+                <div id="uploadStatus" class="status-alert" aria-live="polite"></div>
+            </div>
+
+            <!-- SUPPLEMENTAL FACT PATCHING -->
+            <div class="sidebar-section">
+                <div class="section-title">
+                    <span>⚡ Patch Knowledge</span>
+                </div>
+                <form id="eventForm" class="sidebar-form">
+                    <input type="hidden" name="eventType" value="SUPPLEMENTAL_FACT">
+                    <input type="hidden" name="version" value="1">
+
+                    <label class="field-label">
+                        <span>Target Document</span>
+                        <input name="documentId" id="eventDocumentId" list="documentDatalist" placeholder="Select document..." required>
+                        <datalist id="documentDatalist"></datalist>
+                    </label>
+
+                    <label class="field-label">
+                        <span>Fact Title</span>
+                        <input name="title" id="eventTitle" placeholder="e.g. Metric update" required>
+                    </label>
+
+                    <div class="grid-2">
+                        <label class="field-label">
+                            <span>Fact Key</span>
+                            <input name="factKey" id="factKey" placeholder="key_name" required>
+                        </label>
+                        <label class="field-label">
+                            <span>Priority</span>
+                            <select name="priority" id="factPriority">
+                                <option value="HIGH" selected>HIGH</option>
+                                <option value="NORMAL">NORMAL</option>
+                            </select>
+                        </label>
+                    </div>
+
+                    <div class="grid-2">
+                        <label class="field-label">
+                            <span>Valid From</span>
+                            <input name="validFrom" id="validFromPicker" type="datetime-local" step="1" required>
+                        </label>
+                        <label class="field-label">
+                            <span>Valid To</span>
+                            <input name="validTo" id="validToPicker" type="datetime-local" step="1">
+                        </label>
+                    </div>
+
+                    <input type="hidden" name="operation" value="UPSERT">
+                    <input type="hidden" name="source" value="manual-patch.txt">
+
+                    <label class="field-label">
+                        <span>Updated Fact Content</span>
+                        <textarea name="content" id="eventContent" rows="3" placeholder="Exact verified facts to inject..." required></textarea>
+                    </label>
+
+                    <button class="btn btn-secondary btn-sm" type="submit">Commit Patch</button>
+                </form>
+                <div id="eventStatus" class="status-alert" aria-live="polite"></div>
+            </div>
+
+            <!-- KNOWLEDGE LIBRARY -->
+            <div class="sidebar-section">
+                <div class="section-title">
+                    <span>📚 Knowledge Library</span>
+                </div>
+                <div id="activeDocList" class="doc-tree-list"></div>
+            </div>
+        </div>
+    </aside>
+
+    <!-- MAIN CHAT CANVAS -->
+    <main class="chat-viewport">
+        <!-- TOPBAR -->
+        <header class="chat-navbar">
+            <div class="navbar-left">
+                <!-- Gemini-Style Open Button (visible only when sidebar is collapsed) -->
+                <button class="btn-icon gemini-toggle-btn" id="navbarSidebarToggle" title="Expand Sidebar">
+                    <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <rect x="3" y="3" width="18" height="18" rx="5" ry="5"></rect>
+                        <line x1="9" y1="3" x2="9" y2="21"></line>
+                    </svg>
+                </button>
+                <div class="chat-scope-badge" id="chatScopeBadge">
+                    <span class="dot"></span>
+                    <span id="chatScopeText">All Documents (Unfiltered)</span>
+                    <button type="button" class="btn-clear-chip" id="clearScopeBadgeBtn" title="Reset to all documents" style="display: none;">✕</button>
+                </div>
+            </div>
+
+            <div class="navbar-actions">
+                <button class="btn-ghost btn-sm" id="clearChatBtn">Clear Conversation</button>
+            </div>
+        </header>
+
+        <!-- MESSAGE STREAM CONTAINER -->
+        <div class="conversation-thread" id="chatThread">
+            <div class="welcome-box" id="welcomeBox">
+                <div class="welcome-avatar">⚡</div>
+                <h2>What would you like to verify today?</h2>
+                <p>Ask time-sensitive questions across your ingested PDFs. Supplemental facts are dynamically reconciled in real-time.</p>
+            </div>
+        </div>
+
+        <!-- FLOATING INPUT CAPSULE BAR -->
+        <div class="chat-input-area">
+            <form id="chatForm" class="chat-capsule-box">
+                <!-- TOOLBAR ROW -->
+                <div class="capsule-toolbar">
+                    <div class="toolbar-item" id="filterToolbarContainer">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path></svg>
+                        
+                        <input type="hidden" name="documentId" id="chatDocId">
+
+                        <div id="filterSelectedChip" class="active-doc-pill" style="display: none;">
+                            <span id="filterSelectedTitle">Document</span>
+                            <button type="button" class="btn-chip-remove" id="clearSelectedChipBtn" title="Clear filter">✕</button>
+                        </div>
+
+                        <input id="chatDocSearchInput" list="documentDatalist" placeholder="Focus document (optional)...">
+                    </div>
+
+                    <div class="toolbar-item">
+                        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+                        <input id="asOfPicker" name="asOf" type="datetime-local" step="1" title="Answer As-Of Timestamp">
+                    </div>
+                </div>
+
+                <!-- MAIN PROMPT TEXTAREA -->
+                <div class="capsule-input-row">
+                    <textarea 
+                        name="question" 
+                        id="chatQuestion" 
+                        rows="1" 
+                        placeholder="Message Streaming RAG Assistant..." 
+                        required></textarea>
+
+                    <button type="submit" class="btn-send" id="sendBtn" title="Send message">
+                        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                    </button>
+                </div>
+            </form>
+            <div class="chat-footer-disclaimer">
+                Verified against ChromaDB embeddings and real-time Kafka knowledge streams. Check citations for authenticity.
+            </div>
+        </div>
+    </main>
+
+    <script th:src="@{/js/app.js}"></script>
+</body>
+</html>

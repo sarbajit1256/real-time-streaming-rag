@@ -14,11 +14,7 @@ FROM eclipse-temurin:21-jre-jammy
 WORKDIR /app
 
 # Install Tesseract OCR and English language data
-RUN apt-get update && apt-get install -y --no-install-recommends 
-    tesseract-ocr 
-    tesseract-ocr-eng 
-    && rm -rf /var/lib/apt/lists/*
-
+RUN apt-get update && apt-get install -y --no-install-recommends tesseract-ocr tesseract-ocr-eng && rm -rf /var/lib/apt/lists/*
 # Create a non-root user
 RUN useradd --system --uid 10001 --create-home appuser
 

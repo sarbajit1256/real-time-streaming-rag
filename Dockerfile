@@ -26,7 +26,7 @@ RUN chown -R appuser:appuser /app
 USER appuser
 
 # JVM memory settings
-ENV JAVA_OPTS="-XX:MaxRAMPercentage=60.0 -XX:+UseG1GC"
+ENV JAVA_OPTS="-XX:MaxRAMPercentage=60.0"
 
 # Render provides the PORT environment variable
 EXPOSE 8080

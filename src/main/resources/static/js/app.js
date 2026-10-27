@@ -299,7 +299,7 @@ function resetToNewChat() {
         <div class="welcome-box" id="welcomeBox">
             <div class="welcome-avatar">⚡</div>
             <h2>What would you like to verify today?</h2>
-            <p>Ask time-sensitive questions across your ingested PDFs. Supplemental facts are dynamically reconciled in real-time.</p>
+            <p>Ask time-sensitive questions across your ingested PDFs (digital and scanned OCR documents). Supplemental facts are dynamically reconciled in real-time.</p>
         </div>
     `;
     document.querySelectorAll(".history-item").forEach(item => item.classList.remove("active"));
@@ -408,8 +408,8 @@ if (uploadForm) {
 
         const button = uploadForm.querySelector('button[type="submit"]');
         button.disabled = true;
-        button.textContent = "Inspecting...";
-        showStatus("uploadStatus", "Inspecting PDF contents in memory...");
+        button.textContent = "Inspecting (OCR check)...";
+        showStatus("uploadStatus", "Inspecting PDF contents (OCR ready for scanned documents)...");
 
         const verifiedEntries = [];
 

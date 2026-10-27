@@ -60,15 +60,16 @@
             <div class="sidebar-section">
                 <div class="section-title">
                     <span>📄 Document Ingestion</span>
+                    <span class="ocr-status-tag" title="Automatic OCR enabled for scanned documents">🔍 OCR Active</span>
                 </div>
                 <form id="uploadForm" class="sidebar-form">
                     <label class="drop-capsule" for="pdfFile">
                         <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"></path><polyline points="17 8 12 3 7 8"></polyline><line x1="12" y1="3" x2="12" y2="15"></line></svg>
-                        <span id="dropLabel">Select or drop PDFs</span>
+                        <span id="dropLabel">Select or drop PDFs (Digital &amp; Scanned OCR)</span>
                         <input id="pdfFile" name="files" type="file" accept="application/pdf,.pdf" multiple required>
                     </label>
                     <div id="fileSelectionList" class="file-badges"></div>
-                    <button type="submit" class="btn btn-primary btn-sm">Upload & Index</button>
+                    <button type="submit" class="btn btn-primary btn-sm">Upload &amp; Index</button>
                 </form>
                 <div id="uploadStatus" class="status-alert" aria-live="polite"></div>
             </div>

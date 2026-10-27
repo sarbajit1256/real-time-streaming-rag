@@ -1048,3 +1048,16 @@ body.chat-app {
     border-top: 1px solid var(--border-subtle);
     margin: 12px 0;
 }
+
+.ocr-status-tag {
+    font-size: 0.68rem;
+    font-weight: 600;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+}

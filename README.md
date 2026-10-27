@@ -5,12 +5,13 @@ A local portfolio MVP demonstrating event-driven knowledge ingestion with Java 2
 ## Features
 
 - Publish versioned knowledge events to Kafka over HTTP.
-- Upload text-based PDFs; PDF text extraction happens in the web service and ingestion is queued through Kafka.
-- Kafka consumer chunks content, creates OpenAI embeddings through Spring AI and stores chunks in ChromaDB.
+- **OCR PDF Support**: Upload both digital text PDFs and scanned image-based PDFs (built-in automatic OCR powered by Tesseract / Tess4J with zero manual installation required).
+- Multi-page PDF text extraction with structure and page-aware chunking (`[[PAGE:n]]`).
+- Kafka consumer chunks content, creates vector embeddings through Spring AI and stores chunks in ChromaDB.
 - Time-aware retrieval based on `validFrom` / `validTo` metadata.
 - Ask questions with an optional ISO-8601 `asOf` instant for historical questions.
-- Display retrieved source/version metadata with the generated answer.
-- Simple Thymeleaf UI for PDF uploads, event publishing and chat.
+- Display retrieved source/version metadata and page-level citations with the generated answer.
+- Modern Gemini-inspired web UI with multi-turn conversations, PDF inspection, replacement flow, and document filtering.
 
 ## Requirements
 

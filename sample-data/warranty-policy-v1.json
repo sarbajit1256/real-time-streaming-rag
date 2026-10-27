@@ -1,0 +1,11 @@
+{
+  "eventId": "evt-warranty-v1",
+  "documentId": "warranty-policy",
+  "title": "Warranty Policy",
+  "content": "Eligible electronics products purchased from an authorized retailer have a 24-month warranty from the purchase date. Customers must provide a valid invoice and product serial number. Physical damage and unauthorized repairs are excluded.",
+  "version": 1,
+  "validFrom": "2026-01-01T00:00:00Z",
+  "validTo": "2026-10-22T00:00:00Z",
+  "operation": "UPSERT",
+  "source": "warranty-team"
+}

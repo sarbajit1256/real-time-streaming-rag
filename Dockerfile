@@ -19,18 +19,20 @@ RUN apt-get update && apt-get install -y --no-install-recommends
     tesseract-ocr-eng 
     && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root application user
+# Create a non-root user
 RUN useradd --system --uid 10001 --create-home appuser
 
+# Copy the Spring Boot application JAR
 COPY --from=build /app/target/*.jar /app/app.jar
 
 RUN chown -R appuser:appuser /app
 
 USER appuser
 
-# Render supplies PORT at runtime.
+# JVM memory settings
 ENV JAVA_OPTS="-XX:MaxRAMPercentage=60.0 -XX:+UseG1GC"
 
+# Render provides the PORT environment variable
 EXPOSE 8080
 
 ENTRYPOINT ["sh", "-c", "exec java $JAVA_OPTS -Djava.net.preferIPv4Stack=true -jar /app/app.jar"]

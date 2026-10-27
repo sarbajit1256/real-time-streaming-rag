@@ -774,6 +774,71 @@ document.addEventListener("DOMContentLoaded", () => {
 
     const validFrom = byId("validFromPicker");
     if (validFrom && !validFrom.value) validFrom.value = toPickerValue(new Date());
+	
+	
+	// --------------------------------------------------
+	// CLEAR ALL INDEXED DOCUMENTS
+	// --------------------------------------------------
+
+	byId("clearAllDocumentsBtn")?.addEventListener("click", async () => {
+
+	    const confirmed = confirm(
+	        "Are you sure you want to delete all indexed documents and supplemental facts?\n\n" +
+	        "This action cannot be undone.\n\n" +
+	        "Uploaded PDF files, Kafka messages, and chat history will not be deleted."
+	    );
+
+	    if (!confirmed) {
+	        return;
+	    }
+
+	    const button = byId("clearAllDocumentsBtn");
+
+	    button.disabled = true;
+	    button.textContent = "Clearing...";
+
+	    try {
+	        const response = await fetch(
+	            "/api/knowledge/documents/clear-all",
+	            {
+	                method: "POST"
+	            }
+	        );
+
+	        const result = await response.json();
+
+	        if (!response.ok || result.success !== true) {
+	            throw new Error(
+	                result.message || "Failed to clear indexed documents."
+	            );
+	        }
+
+	        // Remove any active document filter.
+	        clearDocumentFilter();
+
+	        // Refresh the sidebar and autocomplete list.
+	        await populateDocumentAutocomplete();
+
+	        showStatus(
+	            "uploadStatus",
+	            result.message || "Knowledge base cleared successfully."
+	        );
+
+	    } catch (error) {
+	        console.error("Clear-all operation failed:", error);
+
+	        showStatus(
+	            "uploadStatus",
+	            error.message || "Could not clear the knowledge base.",
+	            true
+	        );
+
+	    } finally {
+	        button.disabled = false;
+	        button.textContent = "🗑️ Clear All Documents";
+	    }
+	});
+
 
     populateDocumentAutocomplete();
     renderConversationHistoryList();

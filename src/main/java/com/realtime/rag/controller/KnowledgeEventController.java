@@ -1,45 +1,4 @@
-/*package com.realtime.rag.controller;
 
-import com.realtime.rag.event.KnowledgeEvent;
-import com.realtime.rag.service.KnowledgeEventProducer;
-import com.realtime.rag.service.PdfIngestionService;
-import jakarta.validation.Valid;
-import org.springframework.http.HttpStatus;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
-import java.io.IOException;
-import java.util.Map;
-
-@RestController
-@RequestMapping("/api/knowledge")
-public class KnowledgeEventController {
-    private final KnowledgeEventProducer producer;
-    private final PdfIngestionService pdfIngestionService;
-
-    public KnowledgeEventController(KnowledgeEventProducer producer, PdfIngestionService pdfIngestionService) {
-        this.producer = producer;
-        this.pdfIngestionService = pdfIngestionService;
-    }
-
-    @PostMapping("/events")
-    public ResponseEntity<Map<String, String>> publishEvent(@Valid @RequestBody KnowledgeEvent event) {
-        if (!"UPSERT".equalsIgnoreCase(event.operation()) && !"DELETE".equalsIgnoreCase(event.operation())) {
-            return ResponseEntity.badRequest().body(Map.of("error", "operation must be UPSERT or DELETE"));
-        }
-        producer.publish(event);
-        return ResponseEntity.accepted().body(Map.of("message", "Event published to Kafka", "eventId", event.eventId()));
-    }
-
-    @PostMapping(value = "/pdf", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
-    public ResponseEntity<Map<String, String>> uploadPdf(@RequestParam("file") MultipartFile file) throws IOException {
-        String documentId = pdfIngestionService.upload(file);
-        return ResponseEntity.status(HttpStatus.ACCEPTED).body(Map.of(
-                "message", "PDF queued for ingestion", "documentId", documentId));
-    }
-}
-*/
 
 
 
@@ -276,5 +235,34 @@ public class KnowledgeEventController {
 
         HttpStatus status = successful > 0 ? HttpStatus.ACCEPTED : HttpStatus.BAD_REQUEST;
         return ResponseEntity.status(status).body(response);
+    }
+    
+    
+    
+    @PostMapping("/documents/clear-all")
+    public ResponseEntity<Map<String, Object>> clearAllDocuments() {
+        try {
+            log.warn("Received request to clear all indexed documents and facts.");
+
+            knowledgeIndexService.clearAllDocuments();
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("success", true);
+            response.put("message",
+                    "All indexed documents and supplemental facts have been cleared.");
+
+            return ResponseEntity.ok(response);
+
+        } catch (Exception ex) {
+            log.error("Failed to clear indexed documents and facts.", ex);
+
+            Map<String, Object> response = new LinkedHashMap<>();
+            response.put("success", false);
+            response.put("message",
+                    "Could not clear the knowledge base. Check the application logs.");
+
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(response);
+        }
     }
 }

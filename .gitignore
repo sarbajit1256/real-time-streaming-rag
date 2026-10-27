@@ -1,9 +1,13 @@
+# Maven
 target/
 !.mvn/wrapper/maven-wrapper.jar
 !**/src/main/**/target/
 !**/src/test/**/target/
 
-### STS / Eclipse ###
+# Maven Wrapper
+.mvn/wrapper/maven-wrapper.properties
+
+# STS / Eclipse
 .apt_generated
 .classpath
 .factorypath
@@ -13,23 +17,40 @@ target/
 .sts4-cache
 bin/
 
-### IntelliJ IDEA ###
-.idea
+# IntelliJ IDEA
+.idea/
 *.iws
 *.iml
 *.ipr
 
-### NetBeans ###
+# NetBeans
 /nbproject/private/
 /nbbuild/
 /dist/
 /nbattrs.xml
 /build/
 
-### VS Code ###
+# VS Code
 .vscode/
 
-### System & Environment ###
-.env
+# System files
 .DS_Store
 Thumbs.db
+
+# Environment variables and secrets
+.env
+.env.*
+!.env.example
+
+# Logs
+*.log
+
+# Temporary files
+*.tmp
+*.swp
+*~
+
+# Local uploaded documents and generated data
+uploads/
+data/
+logs/

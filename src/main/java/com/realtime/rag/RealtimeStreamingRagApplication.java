@@ -21,12 +21,12 @@ public class RealtimeStreamingRagApplication {
     }
 
     @Bean
-    CommandLineRunner checkVectorStoreBeans(
+    CommandLineRunner checkChromaBeans(
             ApplicationContext context,
             VectorStore vectorStore) {
 
         return args -> {
-            System.out.println("=== VECTOR STORE BEAN CHECK ===");
+            System.out.println("=== CHROMA BEAN CHECK ===");
 
             System.out.println(
                     "VectorStore beans: " +
@@ -36,31 +36,29 @@ public class RealtimeStreamingRagApplication {
             );
 
             System.out.println(
-                    "Vector-related beans: " +
+                    "Chroma-related beans: " +
                     Arrays.toString(
                             Arrays.stream(
                                     context.getBeanDefinitionNames())
                                     .filter(name ->
                                             name.toLowerCase()
-                                                .contains("qdrant") ||
-                                            name.toLowerCase()
-                                                .contains("vector"))
+                                                .contains("chroma"))
                                     .toArray())
             );
 
-            System.out.println("=== VECTOR STORE WRITE TEST ===");
+            System.out.println("=== CHROMA WRITE TEST ===");
 
             try {
                 Document document = new Document(
-                        "Diagnostic document for testing Qdrant writes."
+                        "Diagnostic document for testing ChromaDB writes."
                 );
 
                 vectorStore.add(List.of(document));
 
-                System.out.println("VECTOR STORE WRITE: SUCCESS");
+                System.out.println("CHROMA WRITE: SUCCESS");
 
             } catch (Exception e) {
-                System.out.println("VECTOR STORE WRITE: FAILED");
+                System.out.println("CHROMA WRITE: FAILED");
                 e.printStackTrace();
             }
         };
